@@ -1,0 +1,45 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.ALL;
+
+entity PlantCareSystem is
+  port ( 
+  
+    stop : in STD_LOGIC;
+	 start : in STD_LOGIC;
+    clk : in STD_LOGIC;
+	 motor : out STD_LOGIC;
+	 stage1 : out STD_LOGIC;
+	 stage2 : out STD_LOGIC;
+	 servoOpen : out STD_LOGIC;
+	 servoClose : out STD_LOGIC;
+    pump : out STD_LOGIC);
+end PlantCareSystem;
+
+architecture System of PlantCareSystem is
+ signal cntr : INTEGER := 0;
+ begin
+  system_cont: process(clk, start, stop)
+  begin
+    if( stop ='1') then
+	    cntr<= 0;
+	 
+    elsif rising_edge(clk) then
+      if start = '0' then
+        cntr <= 0;
+      else
+        if cntr = 100000000 then
+          cntr <= 0;
+        else
+          cntr <= cntr + 1;
+        end if;
+      end if;
+    end if;
+  end process system_cont;
+  motor <= start AND not stop when (cntr >  50000000) else '0';
+  pump <= start AND not stop when (cntr < 50000000) else '0';
+  stage1 <= start AND not stop when (cntr < 50000000) else '0';
+  stage2 <= start AND not stop when (cntr >  50000000) else '0';
+  servoOpen <= start AND not stop when (cntr < 50000000) else '0';
+  servoClose <= start AND not stop when (cntr >  50000000) else '0';
+end System;
